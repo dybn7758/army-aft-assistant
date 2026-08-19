@@ -1,0 +1,39 @@
+services:
+
+  db:
+    image: postgres:14
+    container_name: aft-postgres
+    environment:
+      POSTGRES_DB: aft_assistant
+      POSTGRES_USER: aft_user
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U aft_user -d aft_assistant"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+    container_name: aft-backend
+    ports:
+      - "5000:5000"
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: aft_assistant
+      DB_USER: aft_user
+      DB_PASSWORD: ${DB_PASSWORD}
+      MEM0_API_KEY: ${MEM0_API_KEY}
+      AWS_DEFAULT_REGION: us-east-1
+    volumes:
+      - ~/.aws:/root/.aws:ro  
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  postgres_data:

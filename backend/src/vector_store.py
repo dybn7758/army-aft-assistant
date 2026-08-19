@@ -4,6 +4,7 @@ from langchain_aws import BedrockEmbeddings
 from langchain_community.vectorstores import FAISS
 
 from src.loader import load_and_chunk_documents
+import os
 
 
 BASE_DIR = Path(__file__).parent.parent
@@ -11,12 +12,8 @@ VECTOR_STORE_DIR = BASE_DIR / "vector_store" / "aft_index"
 
 
 def create_embeddings():
-    """
-    Create the Amazon Bedrock Titan embedding model.
-    """
     return BedrockEmbeddings(
-        credentials_profile_name="Ying",
-        region_name="us-east-1",
+        region_name=os.getenv("AWS_REGION", "us-east-1"),
         model_id="amazon.titan-embed-text-v2:0",
     )
 

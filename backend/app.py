@@ -3,21 +3,20 @@ import os
 from datetime import datetime
 from dotenv import load_dotenv
 from flask import Flask, request
+from flask_cors import CORS
 from sqlalchemy import URL
-from mem0 import MemoryClient
 
 from src.database import db
 from src.models import User, AFTTest
 from src.aft_calculator import calculate_event_score, get_age_group
 from src.rag import ask_rag
 
+
 load_dotenv()
 
 app = Flask(__name__)
 
-client = MemoryClient(
-    api_key=os.getenv("MEM0_API_KEY")
-)
+CORS(app)
 
 database_url = URL.create(
     drivername="postgresql+psycopg2",
@@ -40,7 +39,7 @@ with app.app_context():
 
 @app.get("/api/health")
 def health():
-    return {"status": "👌ok"}
+    return {"status": "ok"}
 
 @app.post("/api/users")
 def create_user():
@@ -141,30 +140,37 @@ def calculate_aft():
         }, 400
 
 
-
 @app.post("/api/chat")
 def chat():
     data = request.get_json()
 
-    question = data.get("message")
+    message = data.get("message")
+    user_id = data.get("user_id")
+    session_id = data.get("session_id")
 
-    if not question:
-        return {
-            "error": "message is required"
-        }, 400
+    if not message:
+        return {"error": "message is required"}, 400
+
+    if not user_id:
+        return {"error": "user_id is required"}, 400
+
+    if not session_id:
+        return {"error": "session_id is required"}, 400
 
     try:
-        result = ask_rag(question)
+        result = ask_rag(
+            question=message,
+            user_id=user_id,
+            session_id=session_id,
+        )
 
-        return {
-            "answer": result["answer"],
-            "sources": result["sources"]
-        }
+        return result
 
     except Exception as error:
         return {
             "error": str(error)
         }, 500
 
+        
 if __name__ == "__main__":
     app.run(debug=True)

@@ -6,6 +6,13 @@ from src.vector_store import (
     search_documents,
 )
 
+from src.memory import (
+    get_session_history,
+    save_long_term_memory,
+    search_long_term_memory,
+)
+
+VECTOR_STORE = load_vector_store()
 
 def create_llm():
     return ChatBedrockConverse(
@@ -24,21 +31,31 @@ PROMPT = ChatPromptTemplate.from_messages(
             """
 You are an Army AFT assistant.
 
-Answer the user's question using only the provided context.
+Use the provided AFT context for factual Army AFT information.
 
-If the context does not contain enough information,
-say that you do not have enough information.
+Use long-term user memories only for personalization,
+such as goals or preferences.
+
+Use conversation history to understand follow-up questions.
 
 Do not invent AFT standards or scores.
 
-Context:
+If the AFT context does not contain enough information,
+say that you do not have enough information.
+
+Relevant user memories:
+{memories}
+
+AFT context:
 {context}
+
+Conversation history:
+{history}
 """,
         ),
         ("human", "{question}"),
     ]
 )
-
 
 def format_documents(documents):
     formatted = []
@@ -57,16 +74,33 @@ def format_documents(documents):
     return "\n\n".join(formatted)
 
 
-def ask_rag(question, k=3):
+def ask_rag(
+    question,
+    user_id,
+    session_id,
+    k=3,
+):
     vector_store = load_vector_store()
 
     documents = search_documents(
-        vector_store,
+        VECTOR_STORE,
         question,
         k=k,
     )
 
     context = format_documents(documents)
+
+    session_history = get_session_history(session_id)
+
+    memory_response = search_long_term_memory(
+        user_id=user_id,
+        query=question,
+    )
+
+    memories = memory_response.get(
+        "results",
+        memory_response,
+    )
 
     llm = create_llm()
 
@@ -76,7 +110,18 @@ def ask_rag(question, k=3):
         {
             "context": context,
             "question": question,
+            "history": session_history.messages,
+            "memories": memories,
         }
+    )
+
+    session_history.add_user_message(question)
+    session_history.add_ai_message(response.content)
+
+    save_long_term_memory(
+        user_id=user_id,
+        user_message=question,
+        assistant_message=response.content,
     )
 
     return {
