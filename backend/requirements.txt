@@ -1,6 +1,7 @@
 flask
 flask-cors
 Flask-SQLAlchemy
+Flask-Migrate
 psycopg2-binary
 sqlalchemy
 langchain-core

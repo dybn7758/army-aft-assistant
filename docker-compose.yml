@@ -28,12 +28,29 @@ services:
       DB_USER: aft_user
       DB_PASSWORD: ${DB_PASSWORD}
       MEM0_API_KEY: ${MEM0_API_KEY}
-      AWS_DEFAULT_REGION: us-east-1
+      AWS_REGION: us-east-1
+      AWS_PROFILE: Ying
     volumes:
-      - ~/.aws:/root/.aws:ro  
+      - ${HOME}/.aws:/root/.aws:ro
+
     depends_on:
       db:
         condition: service_healthy
+    
+  frontend:
+    build:
+      context: ./frontend
 
+    container_name: aft-frontend
+
+    ports:
+      - "5173:5173"
+
+    environment:
+      VITE_API_BASE_URL: http://127.0.0.1:5000
+
+    depends_on:
+      - backend
+     
 volumes:
   postgres_data:
