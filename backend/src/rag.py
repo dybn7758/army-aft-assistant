@@ -1,3 +1,4 @@
+import os
 from langchain_aws import ChatBedrockConverse
 from langchain_core.prompts import ChatPromptTemplate
 
@@ -20,8 +21,7 @@ VECTOR_STORE = load_vector_store()
 def create_llm():
     return ChatBedrockConverse(
         model_id="us.amazon.nova-2-lite-v1:0",
-        region_name="us-east-1",
-        credentials_profile_name="Ying",
+        region_name=os.getenv("AWS_REGION", "us-east-1"),
         temperature=0,
         max_tokens=500,
     )

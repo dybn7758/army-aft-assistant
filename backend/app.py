@@ -31,12 +31,11 @@ database_url = URL.create(
 app.config["SQLALCHEMY_DATABASE_URI"] = database_url
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
+
 db.init_app(app)
 
 migrate = Migrate(app, db)
 
-with app.app_context():
-    db.create_all()
 
 def calculate_age(birth_date, test_date):
     age = test_date.year - birth_date.year
