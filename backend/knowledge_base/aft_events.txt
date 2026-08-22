@@ -1,0 +1,16 @@
+Title: Army Fitness Test Events
+Author: United States Army
+Topic: AFT Events
+Source: U.S. Army AFT Website
+
+The Army Fitness Test contains five events.
+
+The Three-Repetition Maximum Deadlift measures muscular strength.
+
+The Hand-Release Push-Up measures upper-body muscular endurance.
+
+The Sprint-Drag-Carry measures muscular strength, muscular endurance, anaerobic power, and anaerobic endurance.
+
+The Plank measures muscular endurance and balance.
+
+The Two-Mile Run measures aerobic endurance.
