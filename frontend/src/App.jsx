@@ -493,7 +493,7 @@ function App() {
   return (
     <main className="app">
       <header>
-        <h1>Army AFT Assistant</h1>
+        <h1>Army AFT Assistant Demo</h1>
 
         <p>
           Army Fitness Test information, scoring, Soldier profiles,
