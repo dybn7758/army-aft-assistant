@@ -1,0 +1,14 @@
+                     USER
+                       ↓
+                  CloudFront
+                 /          \
+                ↓            ↓
+               S3          /api/*
+            React            ↓
+                           ALB
+                            ↓
+                      ECS / Fargate
+                       Flask Backend
+                       /     |      \
+                      ↓      ↓       ↓
+                    RDS   Bedrock   Mem0

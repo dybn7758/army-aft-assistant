@@ -1,0 +1,24 @@
+Frontend: React + Nginx
+Backend: Flask / Python
+Database: PostgreSQL
+
+AI:
+LangChain
+Amazon Titan Embeddings
+FAISS
+Amazon Nova
+Mem0
+
+DevOps:
+Docker / Docker Compose
+Terraform
+GitHub Actions
+
+AWS:
+CloudFront / S3
+ALB
+ECS / Fargate
+RDS
+ECR
+Secrets Manager
+CloudWatch

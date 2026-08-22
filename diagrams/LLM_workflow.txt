@@ -1,0 +1,13 @@
+User question
+     ↓
+Titan Embeddings
+     ↓
+FAISS similarity search
+     ↓
+Relevant AFT chunks
+     ↓
+LangChain
+     ↓
+Amazon Nova
+     ↓
+Grounded response

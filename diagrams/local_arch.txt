@@ -1,0 +1,12 @@
+               Browser
+                  ↓
+            React + Nginx
+                  ↓
+               Flask API
+                  ↓
+             PostgreSQL
+
+Flask also connects to:
+├── FAISS
+├── Bedrock
+└── Mem0

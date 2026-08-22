@@ -308,6 +308,7 @@ resource "aws_db_instance" "postgres" {
 resource "aws_ecr_repository" "backend" {
   name                 = "${var.project_name}-backend"
   image_tag_mutability = "MUTABLE"
+  force_delete         = true
 
   image_scanning_configuration {
     scan_on_push = true
@@ -345,6 +346,7 @@ resource "aws_ecr_lifecycle_policy" "backend" {
 resource "aws_ecr_repository" "frontend" {
   name                 = "${var.project_name}-frontend"
   image_tag_mutability = "MUTABLE"
+  force_delete         = true
 
   image_scanning_configuration {
     scan_on_push = true
@@ -366,7 +368,8 @@ resource "aws_ecr_repository" "frontend" {
 
 resource "aws_secretsmanager_secret" "mem0" {
   name = "${var.project_name}/mem0-api-key"
-
+  recovery_window_in_days = 0
+  
   tags = {
     Project = var.project_name
   }
@@ -676,6 +679,7 @@ resource "aws_ecs_service" "backend" {
 
 resource "aws_s3_bucket" "frontend" {
   bucket_prefix = "army-aft-assistant-frontend-"
+  force_destroy = true
 
   tags = {
     Name    = "${var.project_name}-frontend"
