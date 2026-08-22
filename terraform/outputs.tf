@@ -3,38 +3,31 @@ output "vpc_id" {
   value       = aws_vpc.main.id
 }
 
-
 output "public_subnet_ids" {
   description = "Public subnet IDs"
-
   value = [
     aws_subnet.public_1.id,
     aws_subnet.public_2.id,
   ]
 }
 
-
 output "private_subnet_ids" {
   description = "Private subnet IDs"
-
   value = [
     aws_subnet.private_1.id,
     aws_subnet.private_2.id,
   ]
 }
 
-
 output "alb_security_group_id" {
   description = "ALB security group ID"
   value       = aws_security_group.alb.id
 }
 
-
 output "ecs_security_group_id" {
   description = "ECS security group ID"
   value       = aws_security_group.ecs.id
 }
-
 
 output "rds_security_group_id" {
   description = "RDS security group ID"
@@ -46,26 +39,21 @@ output "rds_endpoint" {
   value       = aws_db_instance.postgres.address
 }
 
-
 output "rds_port" {
   description = "RDS PostgreSQL port"
   value       = aws_db_instance.postgres.port
 }
-
 
 output "rds_database_name" {
   description = "RDS database name"
   value       = aws_db_instance.postgres.db_name
 }
 
-
 output "rds_secret_arn" {
   description = "Secrets Manager ARN containing RDS credentials"
-
   value = (
     aws_db_instance.postgres.master_user_secret[0].secret_arn
   )
-
   sensitive = true
 }
 
@@ -78,7 +66,6 @@ output "backend_ecr_repository_name" {
   description = "ECR repository name"
   value       = aws_ecr_repository.backend.name
 }
-
 
 output "backend_load_balancer_url" {
   description = "Public URL for Flask backend"

@@ -4,6 +4,12 @@ variable "aws_region" {
   default     = "us-east-1"
 }
 
+variable "aws_profile" {
+  description = "Local AWS CLI profile"
+  type        = string
+  default     = "Ying"
+}
+
 variable "project_name" {
   description = "Project name"
   type        = string
@@ -34,8 +40,3 @@ variable "db_allocated_storage" {
   default     = 20
 }
 
-variable "mem0_api_key" {
-  description = "Mem0 API key"
-  type        = string
-  sensitive   = true
-}
