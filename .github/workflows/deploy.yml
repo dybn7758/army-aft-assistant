@@ -1,9 +1,11 @@
-name: Deploy
+name: Deploy AFT Assistant
 
 on:
-  push:
-    branches:
-      - main
+  workflow_run:
+    workflows:
+      - AFT Assistant CI
+    types:
+      - completed
 
 permissions:
   contents: read
@@ -15,13 +17,17 @@ env:
   ECS_SERVICE: army-aft-assistant-backend
 
 jobs:
-  deploy-backend:
+  deploy:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # -------------------------
+      # AWS Authentication
+      # -------------------------
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -29,6 +35,9 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
+      # -------------------------
+      # Backend
+      # -------------------------
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
@@ -46,7 +55,7 @@ jobs:
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
 
-      - name: Force ECS deployment
+      - name: Deploy backend to ECS
         run: |
           aws ecs update-service \
             --cluster "$ECS_CLUSTER" \
@@ -54,48 +63,34 @@ jobs:
             --force-new-deployment \
             --region "$AWS_REGION"
 
-      - name: Wait for ECS service
+      - name: Wait for ECS deployment
         run: |
           aws ecs wait services-stable \
             --cluster "$ECS_CLUSTER" \
             --services "$ECS_SERVICE" \
             --region "$AWS_REGION"
 
-  deploy-frontend:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
-
-      - name: Set up Node
+      # -------------------------
+      # Frontend
+      # -------------------------
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
           cache: npm
           cache-dependency-path: frontend/package-lock.json
 
-      - name: Install dependencies
-        working-directory: frontend
+      - name: Install frontend dependencies
+        working-directory: ./frontend
         run: npm ci
 
       - name: Build frontend
-        working-directory: frontend
-        env:
-          VITE_API_BASE_URL: ${{ secrets.FRONTEND_URL }}
+        working-directory: ./frontend
         run: npm run build
 
-      - name: Upload frontend to S3
+      - name: Deploy frontend to S3
         run: |
-          aws s3 sync \
-            frontend/dist/ \
+          aws s3 sync frontend/dist/ \
             "s3://${{ secrets.FRONTEND_BUCKET }}" \
             --delete
 
